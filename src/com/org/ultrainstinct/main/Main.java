@@ -17,6 +17,8 @@ import com.org.ultrainstinct.ui.DoiMatKhauJFrame;
 import com.org.ultrainstinct.ui.HoiDapJFrame;
 import com.org.ultrainstinct.ui.KhoHangJFrame;
 import com.org.ultrainstinct.ui.ThongBaoJFrame;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 /**
  *
@@ -29,7 +31,16 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();
-        setSize(1800, 1000);
+        // Get the screen dimensions
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = toolkit.getScreenSize();
+        
+        // Calculate the new window dimensions
+        int width = screenSize.width - 100;
+        int height = screenSize.height - 100;
+
+        // Set the size of the window
+        setSize(width, height);
         setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         menu1.setEvent(new MenuEvent() {
