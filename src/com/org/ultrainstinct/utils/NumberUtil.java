@@ -25,4 +25,18 @@ public class NumberUtil {
         bigDecimal = bigDecimal.setScale(places, RoundingMode.HALF_UP);
         return bigDecimal.floatValue();
     }
+
+    public static Float convertObjectToFloat(Object rowData) {
+        if (rowData == null) {
+            return null;
+        }
+        return Float.valueOf((String) rowData);
+    }
+    
+    public static Integer convertObjectToInteger(Object rowData) {
+        if (rowData == null) {
+            return null;
+        }
+        return Integer.valueOf((String) rowData);
+    }
 }

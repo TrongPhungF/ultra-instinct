@@ -1,7 +1,6 @@
 package com.org.ultrainstinct.main;
 
 import com.org.ultrainstinct.ui.BaoCaoDoanhThuJFrame;
-import com.org.ultrainstinct.ui.BaoCaoDonHangJFrame;
 import com.org.ultrainstinct.ui.HoaDonJFrame;
 import com.org.ultrainstinct.ui.KhachHangJFrame;
 import com.org.ultrainstinct.ui.NhanVienJFrame;
@@ -10,11 +9,13 @@ import com.org.ultrainstinct.ui.ThongTinNguoiDungJFrame;
 import com.org.ultrainstinct.ui.BanHangJFrame;
 import java.awt.Component;
 import com.org.ultraInstinct.menu.MenuEvent;
-import com.org.ultrainstinct.ui.BaoCaoKhachHangJFrame;
+import com.org.ultrainstinct.ui.ChartBarAnimationDH_KHJFrame;
+import com.org.ultrainstinct.ui.ChartBarAnimationJFrame;
 import com.org.ultrainstinct.ui.ChiTietSanPhamJFrame;
 import com.org.ultrainstinct.ui.DieuKhoanVaBaoMatJFrame;
 import com.org.ultrainstinct.ui.DoiMatKhauJFrame;
 import com.org.ultrainstinct.ui.HoiDapJFrame;
+import com.org.ultrainstinct.ui.HomeForm;
 import com.org.ultrainstinct.ui.KhoHangJFrame;
 import com.org.ultrainstinct.ui.ThongBaoJFrame;
 import java.awt.Dimension;
@@ -30,8 +31,8 @@ public class Main extends javax.swing.JFrame {
      * Creates new form Main
      */
     public Main() {
-        initComponents();
-        // Get the screen dimensions
+    initComponents();
+     // Get the screen dimensions
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension screenSize = toolkit.getScreenSize();
         
@@ -43,15 +44,16 @@ public class Main extends javax.swing.JFrame {
         setSize(width, height);
         setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        showForm(new HomeForm());
         menu1.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
                 switch (index) {
                     case 0:
-                        showForm(new BanHangJFrame());
+                        showForm(new BanHangJFrame(Main.this));
                         break;
                     case 1:
-                        showForm(new HoaDonJFrame());
+                        showForm(new HoaDonJFrame(Main.this));
                         break;
                     case 2:
                         if (subIndex == 1) {
@@ -64,16 +66,16 @@ public class Main extends javax.swing.JFrame {
                         if (subIndex == 1) {
                             showForm(new BaoCaoDoanhThuJFrame());
                         } else if (subIndex == 2) {
-                            showForm(new BaoCaoDonHangJFrame());
+                            showForm(new ChartBarAnimationJFrame());
                         } else if (subIndex == 3) {
-                            showForm(new BaoCaoKhachHangJFrame());
+                            showForm(new ChartBarAnimationDH_KHJFrame());
                         }
                         break;
                     case 4:
-                        showForm(new KhachHangJFrame());
+                        showForm(new KhachHangJFrame(Main.this));
                         break;
                     case 5:
-                        showForm(new NhanVienJFrame());
+                        showForm(new NhanVienJFrame(Main.this));
                         break;
                     case 6:
                         showForm(new HoiDapJFrame());
@@ -94,7 +96,7 @@ public class Main extends javax.swing.JFrame {
                 }
             }
         });
-    }
+}
 
     public void showForm(Component com) {
         body.removeAll();
@@ -107,7 +109,11 @@ public class Main extends javax.swing.JFrame {
         ChiTietSanPhamJFrame ctsp = new ChiTietSanPhamJFrame();
         ctsp.setVisible(true);
     }
-
+    
+    public void openChiTietHoaDon() {
+        ChiTietSanPhamJFrame cthd = new ChiTietSanPhamJFrame(Main.this);
+        cthd.setVisible(true);
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -175,7 +181,7 @@ public class Main extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-
+        
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.

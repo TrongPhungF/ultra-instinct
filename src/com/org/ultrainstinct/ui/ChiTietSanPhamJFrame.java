@@ -8,6 +8,10 @@ public class ChiTietSanPhamJFrame extends javax.swing.JPanel {
     public ChiTietSanPhamJFrame() {
         initComponents();
     }
+
+    public ChiTietSanPhamJFrame(Main aThis) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
     
     public void setProductDetails(String maSanPham) {
         // Logic to display product details based on maSanPham

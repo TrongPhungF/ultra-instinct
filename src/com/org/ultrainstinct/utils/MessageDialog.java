@@ -21,8 +21,7 @@ public class MessageDialog {
         return JOptionPane.showInputDialog(parent, message, 
                 "Hệ thống quản lý cửa hàng điện tử", JOptionPane.INFORMATION_MESSAGE);
     }
-    
-    public static void alertError(Component parent, String message) {
+     public static void alertError(Component parent, String message) {
         JOptionPane.showMessageDialog(parent, message, 
                 "Hệ thống quản lý cửa hàng điện tử", JOptionPane.ERROR_MESSAGE);
     }

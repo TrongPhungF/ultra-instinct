@@ -1,8 +1,8 @@
 package com.org.ultrainstinct.utils;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.UUID;
-
 
 public class StringUtil {
 
@@ -12,7 +12,15 @@ public class StringUtil {
         return codeFormat.toString();
     }
 
-    private StringUtil () {
+    public static String objectToString(Object object) {
+
+        if (object == null) {
+            return null;
+        }
+        return object.toString();
+    }
+
+    private StringUtil() {
         throw new IllegalStateException("Utility class");
     }
 }

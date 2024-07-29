@@ -4,6 +4,8 @@ import com.org.ultrainstinct.dao.SanPhamDAO;
 import com.org.ultrainstinct.dao.impl.SanPhamDAOImpl;
 import com.org.ultrainstinct.main.Main;
 import com.org.ultrainstinct.model.SanPham;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -13,22 +15,61 @@ public class SanPhamJFrame extends javax.swing.JPanel {
     private SanPhamDAO dao = new SanPhamDAOImpl();
     int index = 0;
     private Main main;
+    List<SanPham> list = new ArrayList<>();
+
     public SanPhamJFrame(Main main) {
         this.main = main;
         initComponents();
         init();
+        fillComboBox();
     }
-    
-    public void init(){
+
+    public void init() {
         filltable();
         tblSanPham.setRowSelectionInterval(0, 0);
+        fillComboBox();
+
+        cboLoai.addActionListener(evt -> filltable());
     }
-    
-    void filltable(){
+
+    void fillComboBox() {
+        // Các giá trị cần thêm vào JComboBox
+        String[] categories = {"Chọn loại hàng", "Garmin", "Loa", "headphone", "earbuds", "soundbar"};
+
+        // Cập nhật các giá trị vào JComboBox
+        cboLoai.setModel(new javax.swing.DefaultComboBoxModel<>(categories));
+    }
+    void filltable() {
         DefaultTableModel model = (DefaultTableModel) tblSanPham.getModel();
         model.setRowCount(0);
+
+        String keyword = txtTimKiem2.getText().trim();
+        String loai = cboLoai.getSelectedItem().toString();
+
         try {
-            List<SanPham> list = dao.findAll();
+            List<SanPham> list = new ArrayList<>();
+
+            // Handle the case where no category is selected
+            if ("Chọn loại hàng".equals(loai)) {
+                loai = null;
+            }
+
+            // Apply filters based on the presence of keyword and loai
+            if (keyword.isEmpty() && loai == null) {
+                list = dao.findAll();
+            } else if (keyword.isEmpty()) {
+                // Filter by Loai only
+                list = dao.selectByLoai(loai);
+            } else if (loai == null) {
+                // Filter by keyword only
+                list = dao.selectByKeyword(keyword);
+            } 
+//            else {
+//                // Filter by both keyword and Loai
+//                list = dao.selectByKeywordAndLoai(keyword, loai);
+//            }
+
+            // Populate the table with filtered data
             for (SanPham sp : list) {
                 Object[] row = {
                     sp.getSanPhamNo(),
@@ -36,13 +77,15 @@ public class SanPhamJFrame extends javax.swing.JPanel {
                     sp.getLoaiSanPham(),
                     sp.getTenSanPham(),
                     sp.getGiaNiemYet(),
-                    sp.getHinh(),
+                    sp.getHinh() != null ? sp.getHinh() : "",
                     sp.getSoLuongTon()
                 };
                 model.addRow(row);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi tải dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -73,7 +116,6 @@ public class SanPhamJFrame extends javax.swing.JPanel {
     void updateTableSelection() {
         if (tblSanPham.getRowCount() > 0) {
             tblSanPham.setRowSelectionInterval(index, index);
-            // Thêm mã để cập nhật giao diện người dùng dựa trên dòng đã chọn
         }
     }
     @SuppressWarnings("unchecked")
@@ -89,7 +131,7 @@ public class SanPhamJFrame extends javax.swing.JPanel {
         btnFirst = new javax.swing.JButton();
         btnLast = new javax.swing.JButton();
         btnTimKiem = new javax.swing.JButton();
-        jComboBox2 = new javax.swing.JComboBox<>();
+        cboLoai = new javax.swing.JComboBox<>();
         jButton4 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblSanPham = new javax.swing.JTable();
@@ -101,7 +143,6 @@ public class SanPhamJFrame extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jLabel1.setText("Sản phẩm");
 
-        txtTimKiem2.setText("Tìm kiếm mã khách hàng");
         txtTimKiem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtTimKiem2ActionPerformed(evt);
@@ -150,7 +191,7 @@ public class SanPhamJFrame extends javax.swing.JPanel {
             }
         });
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn loại hàng", "Garmin", "Loa" }));
+        cboLoai.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn loại hàng", "Garmin", "Loa" }));
 
         jButton4.setBackground(new java.awt.Color(51, 204, 0));
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -177,6 +218,11 @@ public class SanPhamJFrame extends javax.swing.JPanel {
                 "STT", "Mã sản phẩm", "Mã loại sản phẩm", "Tên sản phẩm", "Giá niêm yết", "Hình", "Số lượng tồn"
             }
         ));
+        tblSanPham.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblSanPhamMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblSanPham);
 
         btnNext.setText(">");
@@ -212,7 +258,7 @@ public class SanPhamJFrame extends javax.swing.JPanel {
                                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jScrollPane1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cboLoai, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -248,7 +294,7 @@ public class SanPhamJFrame extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cboLoai, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnFirst)
@@ -310,13 +356,26 @@ public class SanPhamJFrame extends javax.swing.JPanel {
         int selectedRow = tblSanPham.getSelectedRow();
         if (selectedRow >= 0) {
             String maSanPham = tblSanPham.getValueAt(selectedRow, 1).toString();
-            ChiTietSanPhamJFrame ctsp = new ChiTietSanPhamJFrame();
+            ChiTietSanPhamJFrame ctsp = new ChiTietSanPhamJFrame(main);
             ctsp.setProductDetails(maSanPham);
             main.showForm(ctsp);
         } else {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void tblSanPhamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSanPhamMouseClicked
+        // TODO add your handling code here:
+        int selectedRow = tblSanPham.getSelectedRow();
+        if(selectedRow >= 0 ){
+            String maSanPham = tblSanPham.getValueAt(selectedRow, 1).toString();
+            ChiTietSanPhamJFrame ctsp = new ChiTietSanPhamJFrame(main);
+            ctsp.setProductDetails(maSanPham);
+            main.showForm(ctsp);
+        }else{
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_tblSanPhamMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -329,8 +388,8 @@ public class SanPhamJFrame extends javax.swing.JPanel {
     private javax.swing.JButton btnSua;
     private javax.swing.JButton btnTimKiem;
     private javax.swing.JButton btnXoa;
+    private javax.swing.JComboBox<String> cboLoai;
     private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblSanPham;

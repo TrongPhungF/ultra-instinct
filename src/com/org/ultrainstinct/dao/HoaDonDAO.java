@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.org.ultrainstinct.model.HoaDon;
 import com.org.ultrainstinct.model.HoaDonChiTiet;
+import com.org.ultrainstinct.model.SanPham;
 
 /**
  * <p>
@@ -38,4 +39,16 @@ public interface HoaDonDAO extends CRUDDao<HoaDon, Long> {
     void save(HoaDon hoaDon, List<HoaDonChiTiet> hoaDonChiTietList) throws SQLException;
 
     List<HoaDon> selectByKeyword(String keyword);
+
+    public HoaDon findById(String maHoaDon);
+
+    List<HoaDonChiTiet> findHoaDonChiTietByMaHoaDon(String maHoaDon);
+
+    List<SanPham> findTopSellingProducts(int limit) throws SQLException;
+
+    public int getFirstInvoiceYear() throws SQLException;
+
+    List<Integer> getYearinHoaDon() throws SQLException;
+    
+    void updateSoLuongHDCT(List<HoaDonChiTiet> hoaDonChiTietList) throws SQLException;
 }

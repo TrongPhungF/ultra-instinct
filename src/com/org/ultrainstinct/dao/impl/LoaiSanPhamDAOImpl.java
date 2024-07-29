@@ -7,6 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.org.ultrainstinct.model.LoaiSanPham;
 import com.org.ultrainstinct.utils.Constant;
+import com.org.ultrainstinct.utils.MessageDialog;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -138,4 +141,19 @@ public class LoaiSanPhamDAOImpl extends AbstractCrudDao<LoaiSanPham, Long> imple
         return 0L;
     }
     
+     public Map<String, String> getProductTypes() {
+    Map<String, String> productTypes = new HashMap<>();
+    String sql = "SELECT maLoaiSanPham,  tenLoai FROM LoaiSanPham";
+
+    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            productTypes.put(rs.getString("maLoaiSanPham"), rs.getString("tenLoai"));
+        }
+    } catch (SQLException e) {
+        MessageDialog.alert(null, "Failed to get product types.");
+    }
+    return productTypes;
+}
+
 }

@@ -1,22 +1,52 @@
 package com.org.ultrainstinct.ui;
 
+import com.org.ultrainstinct.dao.HoaDonDAO;
+import com.org.ultrainstinct.dao.impl.HoaDonDAOImpl;
+import com.org.ultrainstinct.dao.impl.SanPhamDAOImpl;
+import com.org.ultrainstinct.model.HoaDonChiTiet;
+import com.org.ultrainstinct.model.SanPham;
 import java.awt.Color;
+import java.sql.SQLException;
+import java.util.List;
 import raven.chart.geo.utils.GeoData;
 
 public class HomeForm extends javax.swing.JPanel {
+    private HoaDonDAOImpl hoaDonDAO;
+    private SanPhamDAOImpl sanPhamDAO;
 
     public HomeForm() {
         initComponents();
+        hoaDonDAO = new HoaDonDAOImpl();
+        sanPhamDAO = new SanPhamDAOImpl();
         geoChart.load(GeoData.Resolution.LOW);
         geoChart.getGeoChart().zoom(1.8);
-        geoChart.putData("Vietnam", 8691, new Color(167, 85, 201));
-        geoChart.putData("India", 7770, new Color(85, 159, 201));
-        geoChart.putData("Philippines", 7017, new Color(89, 152, 97));
-        geoChart.putData("Indonesia", 2869, new Color(200, 149, 61));
-        geoChart.putData("Morocco", 2409, new Color(73, 104, 210));
-        geoChart.putData("Mexico", 2023, new Color(180, 73, 168));
-        geoChart.putData("Brazil", 1988, new Color(82, 209, 211));
+
+        try {
+            List<SanPham> topSellingProducts = hoaDonDAO.findTopSellingProducts(10);
+            for (SanPham product : topSellingProducts) {
+                String productName = getProductName(product.getMaSanPham());
+                int totalSold = product.getSoLuongTon(); // Using soLuongTon to store totalSold for charting
+                Color color = generateRandomColor(); // Generate a random color for each product
+
+                geoChart.putData(productName, totalSold, color);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         geoChart.setGeoChartDataView(geoChartDataView);
+    }
+
+    private String getProductName(String maSanPham) {
+        SanPham product = sanPhamDAO.findByIdSP(maSanPham);
+        if (product != null) {
+            return product.getTenSanPham(); // Assuming `tenSanPham` is the product name field
+        }
+        return "Unknown Product"; // Fallback if product name is not found
+    }
+
+    private Color generateRandomColor() {
+        return new Color((int)(Math.random() * 0x1000000));
     }
 
     @SuppressWarnings("unchecked")

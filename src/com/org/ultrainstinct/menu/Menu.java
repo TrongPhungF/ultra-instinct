@@ -1,6 +1,7 @@
 package com.org.ultraInstinct.menu;
 
 import com.org.ultrainstinct.dto.UserSession;
+import com.org.ultrainstinct.ui.DangNhapJDialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -16,10 +17,11 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import net.miginfocom.swing.MigLayout;
 
 public class Menu extends JComponent {
- public MenuEvent getEvent() {
+    public MenuEvent getEvent() {
         return event;
     }
 
@@ -33,7 +35,7 @@ public class Menu extends JComponent {
         {"Bán hàng"},
         {"Giao dịch"},
         {"Hàng hóa", "Quản lý sản phẩm", "Quản lý kho"},
-        {"Báo cáo", "Báo cáo doanh thu", "Báo cáo đơn hàng", "Báo cáo khách hàng"},
+        {"Báo cáo", "Báo cáo doanh thu", "Chart doanh thu", "Chart khách hàng và đơn hàng"},
         {"Khách hàng"},
         {"Nhân viên"},
         {"Hỏi đáp"},
@@ -48,7 +50,7 @@ public class Menu extends JComponent {
         layout = new MigLayout("wrap 1, fillx, gapy 0, inset 2", "fill");
         setLayout(layout);
         setOpaque(true);
-        //  Init MenuItem
+        // Init MenuItem
         for (int i = 0; i < menuItems.length; i++) {
             addMenu(menuItems[i][0], i);
         }
@@ -79,7 +81,7 @@ public class Menu extends JComponent {
                         item.setSelected(true);
                         addSubMenu(item, index, length, getComponentZOrder(item));
                     } else {
-                        //  Hide menu
+                        // Hide menu
                         hideMenu(item, index);
                         item.setSelected(false);
                     }
@@ -94,8 +96,7 @@ public class Menu extends JComponent {
         revalidate();
         repaint();
     }
-
-    private void addSubMenu(MenuItem item, int index, int length, int indexZorder) {
+    void addSubMenu(MenuItem item, int index, int length, int indexZorder) {
         JPanel panel = new JPanel(new MigLayout("wrap 1, fillx, inset 0, gapy 0", "fill"));
         panel.setName(index + "");
         panel.setBackground(new Color(18, 99, 63));
@@ -127,7 +128,7 @@ public class Menu extends JComponent {
             }
         }
     }
-    
+
     private void addUserInfoPanel() {
         JPanel userInfoPanel = new JPanel(new MigLayout("fillx, inset 2", "fill"));
         userInfoPanel.setBackground(new Color(21, 110, 71));
@@ -165,10 +166,20 @@ public class Menu extends JComponent {
 
         logoutButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                // Call logout logic here
-                userSession.clear();
-                // Perform any additional actions such as redirecting to login screen
+            public void actionPerformed(ActionEvent e) {// Xóa thông tin phiên đăng nhập
+                UserSession.clear();
+
+                // Đóng Main frame và hiển thị lại màn hình đăng nhập
+                SwingUtilities.invokeLater(() -> {
+                    DangNhapJDialog loginDialog = new DangNhapJDialog(null, true);
+                    loginDialog.setVisible(true);
+                });
+
+                // Đóng cửa sổ Main hiện tại
+                java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(Menu.this);
+                if (win != null) {
+                    win.dispose();
+                }
             }
         });
 
@@ -178,6 +189,7 @@ public class Menu extends JComponent {
 
         add(userInfoPanel, "south");
     }
+
     @Override
     protected void paintComponent(Graphics grphcs) {
         Graphics2D g2 = (Graphics2D) grphcs.create();
@@ -185,6 +197,4 @@ public class Menu extends JComponent {
         g2.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
         super.paintComponent(grphcs);
     }
-
-
 }

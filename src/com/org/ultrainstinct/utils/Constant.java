@@ -8,8 +8,8 @@ package com.org.ultrainstinct.utils;
  * @author MinhNgoc
  */
 public class Constant {
-
-    public static final String ROLE_MANAGER = "Quản trị viên";
+    
+  public static final String ROLE_MANAGER = "Quản trị viên";
     public static final String ROLE_SALES = "Nhân viên bán hàng";
     /**
      * INSERT_INTO
@@ -94,12 +94,33 @@ public class Constant {
     /**
      * CHAR_HYPHEN "-"
      */
+    //dấu gạch ngang
     public static final String CHAR_HYPHEN = "-";
     
         /**
      * CODE_HD "-"
      */
     public static final String CODE_HD = "HD";
+    
+            /**
+     * CODE_HD "-"
+     */
+    public static final String CODE_HDCT = "HDCT";
+    
+    /**
+     * ID with maHDCT
+     */
+    public static final String HDCT_NO = "HDCTNo";
+    
+        /**
+     * ID with maHDCT
+     */
+    public static final String MA_HDCT = "maHDCT";
+
+    /**
+     * TABLE_NAME LoaiSanPham
+     */
+    public static final String HDCT_TABLE_NAME = "HoaDonChiTiet";
 
     private Constant() {
         throw new IllegalStateException("Utility class");

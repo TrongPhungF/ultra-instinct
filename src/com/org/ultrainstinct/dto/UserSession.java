@@ -3,32 +3,24 @@ package com.org.ultrainstinct.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * <p>
- * SearchSanPhamRequest relate to SanPham table in database.
- * </p>
- */
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class UserSession {
 
-  private static UserSession user;
+    private static UserSession user;
 
     private String userName;
     private String password;
     private String role;
     private String fullName;
 
-    // Hằng số cho các vai trò
-    public static final String ROLE_MANAGER = "Quản trị viên";
-    public static final String ROLE_SALES = "Nhân viên bán hàng";
-    public static final String ROLE_WAREHOUSE = "Nhân viên kho";
-
-    // Hàm khởi tạo private để ngăn chặn tạo thể hiện bên ngoài
-    private UserSession() {
-    }
+    public static final String ROLE_MANAGER = "QTV";
+    public static final String ROLE_SALES = "NVBanHang";
+    public static final String ROLE_WAREHOUSE = "NVKho";
 
     // Phương thức tĩnh để trả về thể hiện duy nhất của lớp
     public static UserSession getUser() {
@@ -38,14 +30,16 @@ public class UserSession {
         return user;
     }
 
+    // Phương thức tĩnh để tạo thể hiện với các tham số userName, password, role và fullName
     public static UserSession getUser(String userName, String password, String role, String fullName) {
         if (user == null) {
-            user = new UserSession();
+            user = new UserSession(userName, password, role, fullName);
+        } else {
+            user.setUserName(userName);
+            user.setPassword(password);
+            user.setRole(role);
+            user.setFullName(fullName);
         }
-        user.setUserName(userName);
-        user.setPassword(password);
-        user.setRole(role);
-        user.setFullName(fullName); // Set giá trị fullName
         return user;
     }
 
@@ -69,32 +63,16 @@ public class UserSession {
         user = null;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
-    }
-
     public void setRole(String role) {
         this.role = role;
-    }
-    
-    public String getFullName() {
-        return fullName;
     }
 
     public void setFullName(String fullName) {

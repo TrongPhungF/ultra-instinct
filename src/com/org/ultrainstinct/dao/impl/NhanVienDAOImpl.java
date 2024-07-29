@@ -7,78 +7,38 @@ import com.org.ultrainstinct.utils.Constant;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * <p>
- * NhanVienDAOImpl represents a concrete implementation of NhanVienDAO.
- * </p>
- *
- * @author MinhNgoc
- */
 public class NhanVienDAOImpl extends AbstractCrudDao<NhanVien, Long> implements NhanVienDAO {
 
-    /**
-     * <p>
-     * Method mapRow NhanVien
-     * </p>
-     *
-     * @param rs ResultSet.
-     * @return NhanVien.
-     * @throws SQLException SQLException.
-     * @author MinhNgoc.
-     */
     @Override
     protected NhanVien mapRow(ResultSet rs) throws SQLException {
         return NhanVien.builder()
             .nhanVienNo(rs.getLong(Constant.NHAN_VIEN_NO))
             .maNhanVien(rs.getString("maNhanVien"))
             .tenNhanVien(rs.getString("tenNhanVien"))
-            .hoNhanVien(rs.getString("tenNhanVien"))
+            .hoNhanVien(rs.getString("hoNhanVien"))
             .matKhau(rs.getString("matKhau"))
             .soDienThoai(rs.getString("soDienThoai"))
             .email(rs.getString("email"))
             .chucVu(rs.getString("chucVu"))
             .trangThaiXoa(rs.getBoolean("trangThaiXoa"))
             .nguoiTao(rs.getString("nguoiTao"))
-            .thoiGianTao(rs.getDate("nguoiTao"))
+            .thoiGianTao(rs.getDate("thoiGianTao"))
             .build();
     }
 
-    /**
-     * <p>
-     * Method getTableName table NhanVien.
-     * </p>
-     *
-     * @return String.
-     * @author MinhNgoc.
-     */
     @Override
     protected String getTableName() {
         return Constant.NHAN_VIEN_TABLE_NAME;
     }
 
-    /**
-     * <p>
-     * Method getPrimaryKeyColumnName.
-     * </p>
-     *
-     * @return String.
-     * @author MinhNgoc.
-     */
     @Override
     protected String getPrimaryKeyColumnName() {
         return Constant.NHAN_VIEN_NO;
     }
 
-    /**
-     * <p>
-     * Method getEntityValues.
-     * </p>
-     *
-     * @param entity NhanVien.
-     * @return Object[].
-     * @author MinhNgoc.
-     */
     @Override
     protected Object[] getEntityValues(NhanVien entity) {
         return new Object[]{
@@ -91,64 +51,131 @@ public class NhanVienDAOImpl extends AbstractCrudDao<NhanVien, Long> implements 
             entity.getChucVu(),
             entity.isTrangThaiXoa(),
             entity.getNguoiTao(),
-            entity.getThoiGianTao(),
+            entity.getThoiGianTao()
         };
     }
 
-    /**
-     * <p>
-     * Method getInsertQuery.
-     * </p>
-     *
-     * @return String
-     * @author MinhNgoc.
-     */
     @Override
     protected String getInsertQuery() {
         return """
-            INSERT INTO
-            """ + Constant.NHAN_VIEN_TABLE_NAME + """
+            INSERT INTO """ + Constant.NHAN_VIEN_TABLE_NAME + """
             (maNhanVien, tenNhanVien, hoNhanVien, matKhau, soDienThoai, email, chucVu, trangThaiXoa, nguoiTao, thoiGianTao) 
             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """;
     }
 
-    /**
-     * <p>
-     * Method getUpdateQuery.
-     * </p>
-     *
-     * @return String
-     * @author MinhNgoc.
-     */
     @Override
     protected String getUpdateQuery() {
         return """
-            UPDATE
-            """ + Constant.NHAN_VIEN_TABLE_NAME + """
+            UPDATE """ + Constant.NHAN_VIEN_TABLE_NAME + """
             SET maNhanVien = ?, tenNhanVien = ?, hoNhanVien = ?, matKhau = ?, 
             soDienThoai = ?, email = ?, chucVu = ?, trangThaiXoa = ?, nguoiTao = ?, thoiGianTao = ?  
-            WHERE
-            """ + Constant.SAN_PHAM_NO + " = ? ";
+            WHERE """ + Constant.NHAN_VIEN_NO + " = ? ";
     }
 
-    /**
-     * <p>
-     * Method get max MaNhanVien.
-     * </p>
-     *
-     * @return long.
-     * @author MinhNgoc.
-     */
     @Override
     public long getMaxMaNhanVien() throws SQLException {
-        String sql = " SELECT COUNT(1) MAX_MA_NHANVIEN FROM " + getTableName();
-
-        PreparedStatement stmt = AbstractCrudDao.connection.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            return rs.getLong("MAX_MA_NHANVIEN");
+        String sql = "SELECT COUNT(1) AS MAX_MA_NHANVIEN FROM " + getTableName();
+        try (PreparedStatement stmt = AbstractCrudDao.connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getLong("MAX_MA_NHANVIEN");
+            }
         }
         return 0L;
+}
+
+    @Override
+    public List<NhanVien> findByKeyword(String keyword) throws SQLException {
+        List<NhanVien> list = new ArrayList<>();
+        String sql = "SELECT * FROM " + getTableName() + " WHERE tenNhanVien LIKE ? OR hoNhanVien LIKE ?";
+        try (PreparedStatement stmt = AbstractCrudDao.connection.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword + "%");
+            stmt.setString(2, "%" + keyword + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                NhanVien nv = mapRow(rs);
+                list.add(nv);
+            }
+        }
+        return list;
     }
+    
+    @Override
+    public NhanVien findById(String maNhanVien) {
+        String sql = "SELECT * FROM " + getTableName() + " WHERE maNhanVien = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, maNhanVien);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    @Override
+    public void deleteById(String maNhanVien) {
+        String sql = "DELETE FROM " + getTableName() + " WHERE maNhanVien = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, maNhanVien);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Xóa nhân viên thất bại: " + e.getMessage());
+        }
+    }
+
+    @Override
+   public void insert(NhanVien nv) throws SQLException {
+    String sql = "INSERT INTO NhanVien (MaNhanVien, TenNhanVien, HoNhanVien, MatKhau, SoDienThoai, Email, ChucVu, ThoiGianTao, NguoiTao, trangThaiXoa) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, nv.getMaNhanVien());
+        ps.setString(2, nv.getTenNhanVien());
+        ps.setString(3, nv.getHoNhanVien());
+        ps.setString(4, nv.getMatKhau());
+        ps.setString(5, nv.getSoDienThoai());
+        ps.setString(6, nv.getEmail());
+        ps.setString(7, nv.getChucVu());
+
+        if (nv.getThoiGianTao() != null) {
+            ps.setDate(8, new java.sql.Date(nv.getThoiGianTao().getTime()));
+        } else {
+            ps.setNull(8, java.sql.Types.DATE);
+        }
+
+        ps.setString(9, nv.getNguoiTao());
+        
+        // Thiết lập giá trị cho cột trangThaiXoa
+        ps.setBoolean(10, nv.isTrangThaiXoa());
+
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Thêm nhân viên thất bại: " + e.getMessage());
+    }
+}
+
+
+
+    @Override
+    public void update(NhanVien nv) throws SQLException {
+String sql = "UPDATE NhanVien SET TenNhanVien=?, HoNhanVien=?, MatKhau=?, SoDienThoai=?, Email=?, ChucVu=?, ThoiGianTao=?, NguoiTao=? WHERE MaNhanVien=?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setString(1, nv.getTenNhanVien());
+        ps.setString(2, nv.getHoNhanVien());
+        ps.setString(3, nv.getMatKhau());
+        ps.setString(4, nv.getSoDienThoai());
+        ps.setString(5, nv.getEmail());
+        ps.setString(6, nv.getChucVu());
+        ps.setDate(7, new java.sql.Date(nv.getThoiGianTao().getTime()));
+        ps.setString(8, nv.getNguoiTao());
+        ps.setString(9, nv.getMaNhanVien());
+
+        ps.executeUpdate();
+    }
+}
+
 }

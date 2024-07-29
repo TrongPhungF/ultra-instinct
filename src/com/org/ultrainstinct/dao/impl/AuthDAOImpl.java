@@ -3,6 +3,7 @@ package com.org.ultrainstinct.dao.impl;
 import com.org.ultrainstinct.dao.AbstractCrudDao;
 import com.org.ultrainstinct.dao.AuthDAO;
 import com.org.ultrainstinct.dto.UserSession;
+import com.org.ultrainstinct.utils.PasswordUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,15 +11,8 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-/**
- * <p>
- * AuthDAOImpl interface implements AuthDAO interface.
- * </p>
- *
- * @author MinhNgoc.
- */
 public class AuthDAOImpl implements AuthDAO {
-    
+
     @Override
     public boolean logIn(String userName, String password) throws SQLException {
         String sql = """
@@ -31,13 +25,11 @@ public class AuthDAOImpl implements AuthDAO {
         try {
             stmt = AbstractCrudDao.connection.prepareStatement(sql);
             stmt.setString(1, userName);
-            stmt.setString(2, password);
+            stmt.setString(2, PasswordUtils.md5(password)); // Mã hóa mật khẩu trước khi so sánh
             rs = stmt.executeQuery();
             if (rs.next()) {
-                // Kết hợp họ và tên thành full name
                 String fullName = rs.getString("hoNhanVien") + " " + rs.getString("tenNhanVien");
-                // Nếu đăng nhập thành công, khởi tạo UserSession với họ tên
-                UserSession.getUser(userName, password, rs.getString("chucVu"), fullName);
+                UserSession.getUser(userName, rs.getString("matKhau"), rs.getString("chucVu"), fullName); // Khởi tạo UserSession với mật khẩu đã mã hóa
                 return true;
             }
             return false;
@@ -77,9 +69,4 @@ public class AuthDAOImpl implements AuthDAO {
         UserSession userSession = UserSession.getUser();
         return userSession != null && userSession.isWarehouse();
     }
-
-   
-
-   
-    
 }

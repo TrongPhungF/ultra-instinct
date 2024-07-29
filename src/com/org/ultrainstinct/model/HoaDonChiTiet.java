@@ -35,4 +35,16 @@ public class HoaDonChiTiet implements Serializable {
     private String maHoaDon;
 
     private String maSanPham;
+    
+    private float thanhTien;
+
+    public float getThanhTien() {
+        return giaBan * soLuong;
+    }
+
+    public void setThanhTien(float thanhTien) {
+        this.thanhTien = thanhTien;
+    }
+    
+    
 }
